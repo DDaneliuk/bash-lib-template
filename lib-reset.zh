@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# colors
+G='\033[0;32m'        # Green
+Y='\033[1;33m'        # Yellow
+R='\033[0;31m'        # Red
+W='\033[0;37m'        # White
+
+# branch logic
+IS_GIT=0
+IS_MAIN_BRANCH=0
+IS_MAIN_BRANCH_UP=0
+
+# Menu item
+main_menu()
+{
+while :
+do
+	clear
+	echo " "
+	sleep 0.1
+	echo "-------------------------------------"
+	sleep 0.1
+	echo "            Main Menu "
+    sleep 0.1
+    echo "-------------------------------------"
+	sleep 0.1
+    echo "[1] Update Main Branch"
+	sleep 0.1
+	echo "[2] Create task branch"
+	sleep 0.1
+	echo "[3] Generate Files for Libs"
+	sleep 0.1
+	echo "[4] Bye bye"
+	sleep 0.1
+	echo "====================================="
+	sleep 0.1
+	echo "Enter your menu choice [1-5]"
+	read m_menu
+
+	case "$m_menu" in
+		1) updateBranch;;
+		2) newBranch;;
+		3) exit 0;;
+		*) echo "Choice correct option"
+	esac
+
+done
+}
+
+updateBranch(){
+	clear
+	echo " "
+	sleep 0.1
+    echo "-------------------------------------"
+	sleep 0.1
+    echo "            Update Branch"
+	sleep 0.1
+    echo "-------------------------------------"
+	sleep 0.1
+
+	if [[ -d .git  ]]; then
+		echo -e "${W}Branch:      ${G}$(git rev-parse --abbrev-ref HEAD)"
+		IS_GIT=1
+		# Check status
+		if [[ `git status --porcelain` ]]; then
+			sleep 0.1
+        	echo -e "${W}Status:     ${G} Has changes." && sleep 0.1 && git status -s
+			sleep 0.1
+        	echo -e "${W}Do you wish to update branch? ${G}1 ${W}or ${G}2${W}"
+        	select yn in Yes No
+        	do
+        	case $yn in
+            	Yes)
+                	echo -ne "Clear changes" \\r && git checkout -- .
+					sleep 0.1
+					MAIN_BRANCH="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
+					echo -ne -e "Chekout into ${G}${MAIN_BRANCH} \\r" && git checkout $MAIN_BRANCH
+                	sleep 0.1
+					echo -ne -e "${Y}Updating branch" \\r && git pull
+					sleep 0.1
+					echo -ne -e "${Y}Current branch: ${G}$(git rev-parse --abbrev-ref HEAD)" \\r
+                	echo ""
+					IS_MAIN_BRANCH=1
+					IS_MAIN_BRANCH_UP=1
+            	break;
+            	;;
+            	No) return;;
+        	esac
+    		done
+		else
+			echo -e "${W}Status:     ${G}No changes. Start updating repository"
+        	echo -e "${W}$(git pull)"
+		fi
+    else
+        # No git exit
+		echo -e "${R}No git in this folder"
+    fi
+	echo " "
+	echo -e "${W}Press Enter to continue"
+	read
+		return
+}
+
+newBranch(){
+	clear
+    echo " "
+    sleep 0.1
+    echo "-------------------------------------"
+    sleep 0.1
+    echo "          Create Task Branch"
+    sleep 0.1
+    echo "-------------------------------------"
+    sleep 0.1
+
+	if [[ $IS_GIT -eq 1 ]] && [[ $IS_MAIN_BRANCH -eq 1 ]] && [[ $IS_MAIN_BRANCH_UP -eq 1 ]]; then
+		echo "New branch:"
+		read NEW_BRANCH
+		git checkout -b $NEW_BRANCH
+		echo -e "${W}Branch:      ${G}$(git rev-parse --abbrev-ref HEAD)"
+		echo -e "${W}Press Enter to continue"
+		read
+			return
+	else
+		echo -e "${R}Update branch firstly [1]"
+		echo -e "${W}Press Enter to continue"
+	fi
+
+	read
+		return
+}
+
+main_menu
