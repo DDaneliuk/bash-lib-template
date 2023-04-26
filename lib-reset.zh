@@ -35,13 +35,16 @@ do
 	sleep 0.1
 	echo "====================================="
 	sleep 0.1
-	echo "Enter your menu choice [1-5]"
+	echo "Enter your menu choice [1-4]"
+	sleep 0.1
+	echo " " && echo "Happy hacking!"
 	read m_menu
 
 	case "$m_menu" in
 		1) updateBranch;;
 		2) newBranch;;
-		3) exit 0;;
+		3) generate;;
+		4) clear && sleep 0.1 && echo -e "bye bye." && exit 0;;
 		*) echo "Choice correct option"
 	esac
 
@@ -130,4 +133,46 @@ newBranch(){
 		return
 }
 
+generate(){
+	clear
+    echo " "
+    sleep 0.1
+    echo "-------------------------------------"
+    sleep 0.1
+    echo "          Generate files"
+    sleep 0.1
+    echo "-------------------------------------"
+    sleep 0.1
+
+	# check lib
+	LIB_NAME=$(jq -r '.name' package.json)
+	echo -e "${W}Library:   ${G}${LIB_NAME}${W}"
+
+	# type of component
+	echo " "
+	sleep 0.1
+    read -p "[?] Write id of component:       " COM_ID
+	sleep 0.1
+	read -p "[?] Write name of component:     " COM_NAME
+	sleep 0.1
+	read -p "[?] Write category of component: " COM_CATEGORY
+	echo $COM_ID $COM_NAME $COM_CATEGORY
+
+	case $LIB_NAME in
+		@deeepvision/lp-template-default)
+			echo " "
+			sleep 0.1
+			echo -e "${G}[+] ${W}Start generate"
+			sleep 0.1
+			echo -e "${G}[+] ${W}Create folder ${COM_NAME} in ${COM_CATEGORY}" && mkdir ./pages/$COM_CATEGORY/$COM_NAME
+			sleep 0.1
+			echo -e "${G}[+] ${W}Create sample.js"
+		;;
+	esac
+	read
+		return
+}
 main_menu
+
+
+
